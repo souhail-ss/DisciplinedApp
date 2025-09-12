@@ -9,7 +9,7 @@ interface HeaderProps {
 export const Header = ({ userName }: HeaderProps) => {
   return (
     <StyledHeader>
-      <Text variant="h1">Disciplined App</Text>
+      <Text variant="h1">Stay disciplined</Text>
       <Text variant="body">Good Morning, {userName}!</Text>
       <Text variant="caption">Start your day with purpose!</Text>
     </StyledHeader>

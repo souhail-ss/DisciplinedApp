@@ -2,10 +2,10 @@ import styled from 'styled-components';
 
 export const Home = styled.div`
   min-height: 100vh;
-  background: linear-gradient(to bottom, var(--mid-light-blue), var(--white));
+  background: linear-gradient(to bottom, #000000,#0e2343 );
   padding: 1rem;
-  position: relative;
   display: flex;
+  justify-content: center;
   align-items: center;
 `;
 

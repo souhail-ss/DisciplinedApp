@@ -5,7 +5,7 @@ import { GoalCard } from '../molecules/GoalCard';
 import { Text } from '../atoms/Text';
 import { GoalsListContainer } from './GoalsList.style';
 
-export const GoalsList = () => {
+export const GoalsList: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
@@ -37,10 +37,16 @@ export const GoalsList = () => {
       ) : (
         <div>
           {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onMarkDone={() => handleMarkDone(goal.id)} />
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onMarkDone={() => handleMarkDone(goal.id ?? 0)}
+            />
           ))}
         </div>
       )}
     </GoalsListContainer>
   );
 };
+
+export default GoalsList;
