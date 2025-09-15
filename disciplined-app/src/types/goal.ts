@@ -1,8 +1,7 @@
 export interface Goal {
-  id: number;
+  id?: number;
   title: string;
   description: string;
-  type: 'daily' | 'one-time';
-  date?: string;
+  isDaily: boolean;
   completed?: boolean;
 }

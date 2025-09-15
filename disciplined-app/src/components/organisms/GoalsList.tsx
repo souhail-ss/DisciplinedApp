@@ -1,31 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { Goal } from '../../types/goal';
 import { GoalCard } from '../molecules/GoalCard';
 import { Text } from '../atoms/Text';
 import { GoalsListContainer } from './GoalsList.style';
 
-export const GoalsList: React.FC = () => {
-  const [goals, setGoals] = useState<Goal[]>([]);
+interface GoalsListProps {
+  goals: Goal[];
+  setGoals: React.Dispatch<React.SetStateAction<Goal[]>>;
+}
 
-  useEffect(() => {
-    const fetchGoals = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/goals/today');
-        setGoals(response.data);
-      } catch (error) {
-        console.error('Error fetching goals:', error);
-      }
-    };
-    fetchGoals();
-  }, []);
-
-  const handleMarkDone = async (id: number) => {
-    try {
-      await axios.put(`http://localhost:3000/goals/${id}/complete`);
-      setGoals(goals.map(goal => goal.id === id ? { ...goal, completed: true } : goal));
-    } catch (error) {
-      console.error('Error marking goal as done:', error);
+export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals }) => {
+  const handleMarkDone = (id: number, isCompleted: boolean) => {
+    if (isCompleted) {
+      // Mark as completed
+      setGoals((prevGoals) =>
+        prevGoals.map((goal) =>
+          goal.id === id ? { ...goal, completed: true } : goal
+        )
+      );
+    } else {
+      // Delete the goal
+      setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== id));
     }
   };
 
@@ -40,7 +35,7 @@ export const GoalsList: React.FC = () => {
             <GoalCard
               key={goal.id}
               goal={goal}
-              onMarkDone={() => handleMarkDone(goal.id ?? 0)}
+              onMarkDone={(id, isCompleted) => handleMarkDone(id, isCompleted)}
             />
           ))}
         </div>

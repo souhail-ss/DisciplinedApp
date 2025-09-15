@@ -1,25 +1,32 @@
 import React from 'react';
 import { Button } from '../atoms/Button';
 import { Text } from '../atoms/Text';
-import { GoalCard as StyledGoalCard } from './GoalCard.style';
+import { GoalCardButton, GoalDescription, GoalTitle, GoalCard as StyledGoalCard } from './GoalCard.style';
 import { Goal } from '../../types/goal';
 
 interface GoalCardProps {
   goal: Goal;
-  onMarkDone: () => void;
+  onMarkDone: (id: number, isCompleted: boolean) => void; // Updated to pass id and action
 }
 
-export const GoalCard = ({ goal, onMarkDone }: GoalCardProps) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onMarkDone }: GoalCardProps) => {
+  const handleClick = () => {
+    if (goal.completed) {
+      onMarkDone(goal.id ?? 0, false); // Delete the goal when already completed
+    } else {
+      onMarkDone(goal.id ?? 0, true); // Mark as completed
+    }
+  };
+
   return (
     <StyledGoalCard>
-      <Text variant="h2">{goal.title}</Text>
-      <Text variant="body">{goal.description}</Text>
-      <Button
-        variant={goal.completed ? 'success' : 'primary'}
-        onClick={onMarkDone}
+      <GoalTitle>{goal.title}</GoalTitle>
+      <GoalDescription>{goal.description}</GoalDescription>
+      <GoalCardButton
+        onClick={handleClick}
       >
         {goal.completed ? 'Done' : 'Mark Done'}
-      </Button>
+      </GoalCardButton>
     </StyledGoalCard>
   );
 };
