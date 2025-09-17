@@ -1,31 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../molecules/Header';
 import { GoalsList } from './GoalsList';
 import { Button } from '../atoms/Button';
 import { Home, AddButton } from './HomeOrganism.style';
 import Modal from '../atoms/Modal';
+import api from '../../api/axiosConfig';
 
 interface Goal {
   id?: number;
   title: string;
   description: string;
-  isDaily: boolean;
+  type: 'daily' | 'weekly';
   completed?: boolean;
+  createdDate?: Date;
 }
 
 export const HomeOrganism: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddGoal = (title: string, description: string, isDaily: boolean) => {
-    const newGoal: Goal = {
-      id: Date.now(),
-      title,
-      description,
-      isDaily,
-      completed: false,
-    };
-    setGoals((prevGoals) => [...prevGoals, newGoal]);
+  useEffect(() => {
+    fetchGoals();
+  }, []);
+
+  const fetchGoals = async () => {
+    try {
+      const response = await api.get('/goals');
+      setGoals(response.data);
+    } catch (error) {
+      console.error('Error fetching goals:', error);
+    }
+  };
+
+  const handleAddGoal = async (title: string, description: string, isDaily: boolean) => {
+    try {
+      console.log('Home receiving:', { title, description, isDaily }); // Debug log
+      const type = isDaily ? 'daily' : 'weekly';
+      const response = await api.post('/goals', { title, description, type });
+      if (!response.data) throw new Error('No data returned');
+      setGoals((prevGoals) => [...prevGoals, response.data]);
+    } catch (error) {
+      console.error('Error adding goal:', error);
+    }
   };
 
   return (

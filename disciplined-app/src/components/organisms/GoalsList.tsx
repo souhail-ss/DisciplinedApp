@@ -3,6 +3,7 @@ import { Goal } from '../../types/goal';
 import { GoalCard } from '../molecules/GoalCard';
 import { Text } from '../atoms/Text';
 import { GoalsListContainer } from './GoalsList.style';
+import api from '../../api/axiosConfig';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -10,17 +11,24 @@ interface GoalsListProps {
 }
 
 export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals }) => {
-  const handleMarkDone = (id: number, isCompleted: boolean) => {
-    if (isCompleted) {
-      // Mark as completed
-      setGoals((prevGoals) =>
-        prevGoals.map((goal) =>
-          goal.id === id ? { ...goal, completed: true } : goal
-        )
-      );
-    } else {
-      // Delete the goal
-      setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== id));
+  const handleMarkDone = async (id: number, currentCompleted: boolean) => {
+    try {
+      const response = await api.put(`/goals/${id}/complete`);
+      const updatedGoal = response.data;
+      if (updatedGoal) {
+        setGoals((prevGoals) =>
+          prevGoals.map((goal) =>
+            goal.id === id ? { ...goal, completed: !currentCompleted } : goal
+          )
+        );
+        if (updatedGoal.type === 'daily' && !currentCompleted) {
+          setGoals((prevGoals) => prevGoals.filter((g) => g.id !== id));
+        }
+      } else {
+        setGoals((prevGoals) => prevGoals.filter((g) => g.id !== id));
+      }
+    } catch (error) {
+      console.error('Error marking goal:', error);
     }
   };
 
@@ -35,7 +43,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals }) => {
             <GoalCard
               key={goal.id}
               goal={goal}
-              onMarkDone={(id, isCompleted) => handleMarkDone(id, isCompleted)}
+              onMarkDone={() => handleMarkDone(goal.id ?? 0, goal.completed ?? false)}
             />
           ))}
         </div>

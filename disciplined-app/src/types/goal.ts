@@ -2,6 +2,8 @@ export interface Goal {
   id?: number;
   title: string;
   description: string;
-  isDaily: boolean;
+  type: 'daily' | 'weekly';
   completed?: boolean;
+  createdDate?: Date;
+  lastResetDate?: Date;
 }

@@ -23,10 +23,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(title, description, isDaily);
-    setTitle('');
-    setDescription('');
-    onClose();
+    console.log('Modal submitting:', { title, description, isDaily }); // Debug log
+    if (title.trim() && description.trim()) {
+      onSubmit(title, description, isDaily);
+      setTitle('');
+      setDescription('');
+      onClose();
+    } else {
+      alert('Please fill in both title and description');
+    }
   };
 
   return (
