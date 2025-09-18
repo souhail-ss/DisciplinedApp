@@ -5,10 +5,10 @@ export const Home = styled.div`
   background: linear-gradient(to bottom, #000000,#0e2343 );
   padding: 1rem;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
-
 export const AddButton = styled.button`
   position: fixed;
   bottom: 1rem;
