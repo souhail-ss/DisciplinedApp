@@ -1,36 +1,36 @@
-import { Controller, Get, Post, Body, Param, Put, Patch } from '@nestjs/common'; // Add Patch decorator
+import { Controller, Get, Post, Body, Param, Put, Patch } from '@nestjs/common';
 import { GoalsService } from './goals.service';
-import type { Goal } from '../types/goal';
+import { Goal } from './entities/goal.entity'; // Update import to entity
 
 @Controller('goals')
 export class GoalsController {
   constructor(private readonly goalsService: GoalsService) {}
 
   @Post()
-  create(@Body() goalData: Omit<Goal, 'id' | 'createdDate'>): Goal {
+  async create(@Body() goalData: Omit<Goal, 'id' | 'createdDate'>): Promise<Goal> {
     return this.goalsService.createGoal(goalData);
   }
 
   @Get()
-  findAll(): Goal[] {
+  async findAll(): Promise<Goal[]> {
     return this.goalsService.getGoals();
   }
 
   @Get('today')
-  getToday(): Goal[] {
-    return this.goalsService.getGoals();
+  async getToday(): Promise<Goal[]> {
+    return this.goalsService.getGoals(); // Adjust if you want only today's goals
   }
 
   @Put(':id/complete')
-  complete(@Param('id') id: string): Goal | null {
+  async complete(@Param('id') id: string): Promise<Goal | null> {
     return this.goalsService.markGoalDone(parseInt(id));
   }
 
-  @Patch(':id') // New endpoint to update a goal's title or description
-  update(
+  @Patch(':id')
+  async update(
     @Param('id') id: string,
-    @Body() updateData: Partial<Pick<Goal, 'title' | 'description'>>, // Allow partial updates to title or description
-  ): Goal | null {
+    @Body() updateData: Partial<Pick<Goal, 'title' | 'description'>>,
+  ): Promise<Goal | null> {
     return this.goalsService.updateGoal(parseInt(id), updateData);
   }
 }

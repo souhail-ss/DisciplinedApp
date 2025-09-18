@@ -20,19 +20,19 @@ let GoalsController = class GoalsController {
     constructor(goalsService) {
         this.goalsService = goalsService;
     }
-    create(goalData) {
+    async create(goalData) {
         return this.goalsService.createGoal(goalData);
     }
-    findAll() {
+    async findAll() {
         return this.goalsService.getGoals();
     }
-    getToday() {
+    async getToday() {
         return this.goalsService.getGoals();
     }
-    complete(id) {
+    async complete(id) {
         return this.goalsService.markGoalDone(parseInt(id));
     }
-    update(id, updateData) {
+    async update(id, updateData) {
         return this.goalsService.updateGoal(parseInt(id), updateData);
     }
 };
@@ -42,26 +42,26 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Object)
+    __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Array)
+    __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('today'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Array)
+    __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "getToday", null);
 __decorate([
     (0, common_1.Put)(':id/complete'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Object)
+    __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "complete", null);
 __decorate([
     (0, common_1.Patch)(':id'),
@@ -69,7 +69,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Object)
+    __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "update", null);
 exports.GoalsController = GoalsController = __decorate([
     (0, common_1.Controller)('goals'),

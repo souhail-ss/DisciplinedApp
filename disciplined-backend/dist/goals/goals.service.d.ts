@@ -1,11 +1,12 @@
-import { Goal } from '../types/goal';
+import { Repository } from 'typeorm';
+import { Goal } from './entities/goal.entity';
 export declare class GoalsService {
-    private goals;
-    private idCounter;
-    createGoal(goalData: Omit<Goal, 'id' | 'createdDate'>): Goal;
-    getGoals(): Goal[];
-    markGoalDone(id: number): Goal | null;
-    updateGoal(id: number, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Goal | null;
-    resetDailyGoals(): void;
-    sendReminder(): void;
+    private goalsRepository;
+    constructor(goalsRepository: Repository<Goal>);
+    createGoal(goalData: Omit<Goal, 'id' | 'createdDate'>): Promise<Goal>;
+    getGoals(): Promise<Goal[]>;
+    markGoalDone(id: number): Promise<Goal | null>;
+    updateGoal(id: number, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Promise<Goal | null>;
+    resetDailyGoals(): Promise<void>;
+    sendReminder(): Promise<void>;
 }

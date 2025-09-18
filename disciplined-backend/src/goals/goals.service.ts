@@ -1,68 +1,65 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Goal } from './entities/goal.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DateTime } from 'luxon';
-import { Goal } from '../types/goal';
 
 @Injectable()
 export class GoalsService {
-  private goals: Goal[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Goal)
+    private goalsRepository: Repository<Goal>,
+  ) {}
 
-  createGoal(goalData: Omit<Goal, 'id' | 'createdDate'>): Goal {
-    const newGoal: Goal = {
-      id: this.idCounter++,
+  async createGoal(goalData: Omit<Goal, 'id' | 'createdDate'>): Promise<Goal> {
+    const newGoal = this.goalsRepository.create({
       ...goalData,
       completed: false,
-      createdDate: new Date(),
-    };
-    this.goals.push(newGoal);
-    return newGoal;
+    });
+    return await this.goalsRepository.save(newGoal);
   }
 
-  getGoals(): Goal[] {
-    return this.goals;
+  async getGoals(): Promise<Goal[]> {
+    return await this.goalsRepository.find();
   }
 
-  markGoalDone(id: number): Goal | null {
-    const goal = this.goals.find((g) => g.id === id);
-    if (goal) {
-      goal.completed = true;
-      if (goal.type === 'daily') {
-        this.goals = this.goals.filter((g) => g.id !== id);
-      }
-      return goal;
+  async markGoalDone(id: number): Promise<Goal | null> {
+    const goal = await this.goalsRepository.findOne({ where: { id } });
+    if (!goal) return null;
+    goal.completed = true;
+    const savedGoal = await this.goalsRepository.save(goal);
+    if (goal.type === 'daily') {
+      await this.goalsRepository.remove(goal);
+      return null;
     }
-    return null;
+    return savedGoal;
   }
 
-  updateGoal(id: number, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Goal | null { // New method to update goal
-    const goal = this.goals.find((g) => g.id === id); // Find the goal by ID
-    if (goal) { // If the goal exists
-      Object.assign(goal, updateData); // Update the goal's title or description with the new data
-      return goal; // Return the updated goal
-    }
-    return null; // Return null if the goal wasn't found
+  async updateGoal(id: number, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Promise<Goal | null> {
+    const goal = await this.goalsRepository.findOne({ where: { id } });
+    if (!goal) return null;
+    Object.assign(goal, updateData);
+    return await this.goalsRepository.save(goal);
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { timeZone: 'Europe/Paris' })
-  resetDailyGoals() {
+  async resetDailyGoals() {
     const now = DateTime.now().setZone('Europe/Paris');
-    this.goals = this.goals.filter((goal) => {
-      if (goal.type === 'daily' && !goal.completed) {
-        goal.completed = false;
-        goal.lastResetDate = now.toJSDate();
-        return true;
-      }
-      return true;
-    });
+    const dailyGoals = await this.goalsRepository.find({ where: { type: 'daily', completed: false } });
+    for (const goal of dailyGoals) {
+      goal.completed = false;
+      goal.lastResetDate = now.toJSDate();
+      await this.goalsRepository.save(goal);
+    }
     console.log('Daily goals reset for new day');
   }
 
   @Cron('0 * * * *', { timeZone: 'Europe/Paris' })
-  sendReminder() {
-    const unfinishedDaily = this.goals.filter((goal) => goal.type === 'daily' && !goal.completed);
+  async sendReminder() {
+    const unfinishedDaily = await this.goalsRepository.find({ where: { type: 'daily', completed: false } });
     if (unfinishedDaily.length > 0) {
-      console.log(`Reminder: You have ${unfinishedDaily.length} unfinished daily goals:`, unfinishedDaily.map((g) => g.title));
+      console.log(`Reminder: ${unfinishedDaily.length} unfinished daily goals:`, unfinishedDaily.map(g => g.title));
     }
   }
 }

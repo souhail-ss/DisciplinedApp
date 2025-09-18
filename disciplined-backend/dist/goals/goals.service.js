@@ -8,62 +8,65 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoalsService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const goal_entity_1 = require("./entities/goal.entity");
 const schedule_1 = require("@nestjs/schedule");
 const luxon_1 = require("luxon");
 let GoalsService = class GoalsService {
-    goals = [];
-    idCounter = 1;
-    createGoal(goalData) {
-        const newGoal = {
-            id: this.idCounter++,
+    goalsRepository;
+    constructor(goalsRepository) {
+        this.goalsRepository = goalsRepository;
+    }
+    async createGoal(goalData) {
+        const newGoal = this.goalsRepository.create({
             ...goalData,
             completed: false,
-            createdDate: new Date(),
-        };
-        this.goals.push(newGoal);
-        return newGoal;
-    }
-    getGoals() {
-        return this.goals;
-    }
-    markGoalDone(id) {
-        const goal = this.goals.find((g) => g.id === id);
-        if (goal) {
-            goal.completed = true;
-            if (goal.type === 'daily') {
-                this.goals = this.goals.filter((g) => g.id !== id);
-            }
-            return goal;
-        }
-        return null;
-    }
-    updateGoal(id, updateData) {
-        const goal = this.goals.find((g) => g.id === id);
-        if (goal) {
-            Object.assign(goal, updateData);
-            return goal;
-        }
-        return null;
-    }
-    resetDailyGoals() {
-        const now = luxon_1.DateTime.now().setZone('Europe/Paris');
-        this.goals = this.goals.filter((goal) => {
-            if (goal.type === 'daily' && !goal.completed) {
-                goal.completed = false;
-                goal.lastResetDate = now.toJSDate();
-                return true;
-            }
-            return true;
         });
+        return await this.goalsRepository.save(newGoal);
+    }
+    async getGoals() {
+        return await this.goalsRepository.find();
+    }
+    async markGoalDone(id) {
+        const goal = await this.goalsRepository.findOne({ where: { id } });
+        if (!goal)
+            return null;
+        goal.completed = true;
+        const savedGoal = await this.goalsRepository.save(goal);
+        if (goal.type === 'daily') {
+            await this.goalsRepository.remove(goal);
+            return null;
+        }
+        return savedGoal;
+    }
+    async updateGoal(id, updateData) {
+        const goal = await this.goalsRepository.findOne({ where: { id } });
+        if (!goal)
+            return null;
+        Object.assign(goal, updateData);
+        return await this.goalsRepository.save(goal);
+    }
+    async resetDailyGoals() {
+        const now = luxon_1.DateTime.now().setZone('Europe/Paris');
+        const dailyGoals = await this.goalsRepository.find({ where: { type: 'daily', completed: false } });
+        for (const goal of dailyGoals) {
+            goal.completed = false;
+            goal.lastResetDate = now.toJSDate();
+            await this.goalsRepository.save(goal);
+        }
         console.log('Daily goals reset for new day');
     }
-    sendReminder() {
-        const unfinishedDaily = this.goals.filter((goal) => goal.type === 'daily' && !goal.completed);
+    async sendReminder() {
+        const unfinishedDaily = await this.goalsRepository.find({ where: { type: 'daily', completed: false } });
         if (unfinishedDaily.length > 0) {
-            console.log(`Reminder: You have ${unfinishedDaily.length} unfinished daily goals:`, unfinishedDaily.map((g) => g.title));
+            console.log(`Reminder: ${unfinishedDaily.length} unfinished daily goals:`, unfinishedDaily.map(g => g.title));
         }
     }
 };
@@ -72,15 +75,17 @@ __decorate([
     (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_DAY_AT_MIDNIGHT, { timeZone: 'Europe/Paris' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GoalsService.prototype, "resetDailyGoals", null);
 __decorate([
     (0, schedule_1.Cron)('0 * * * *', { timeZone: 'Europe/Paris' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GoalsService.prototype, "sendReminder", null);
 exports.GoalsService = GoalsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(goal_entity_1.Goal)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], GoalsService);
 //# sourceMappingURL=goals.service.js.map
