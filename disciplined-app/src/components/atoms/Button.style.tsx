@@ -1,25 +1,28 @@
 import styled from 'styled-components';
 
-export const Button = styled.button<{ variant?: 'primary' | 'success' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+export const Button = styled.button`
+  margin-left: 15%;
+  padding: 0.7rem 1rem;
+  border-radius: 0.6rem;
+  border: none;
   font-weight: 500;
-  color: var(--white);
+  font-size: 1rem;
+  color: var(--black);
   transition: background-color 0.2s ease;
   cursor: pointer;
 
   ${({ variant }) =>
     variant === 'success'
       ? `
-        background-color: var(--light-green);
+        background-color:#26c6da;
         &:hover {
-          background-color: #a5d6a7;
+          background-color: #26c6da;
         }
       `
       : `
-        background-color: var(--soft-teal);
+        background-color: #e95d5d;
         &:hover {
-          background-color: #26c6da;
+          background-color: #ed2020;
         }
       `}
 `;

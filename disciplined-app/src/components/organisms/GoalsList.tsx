@@ -8,9 +8,10 @@ import api from '../../api/axiosConfig';
 interface GoalsListProps {
   goals: Goal[];
   setGoals: React.Dispatch<React.SetStateAction<Goal[]>>;
+  onEdit: (id: number) => void;
 }
 
-export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals }) => {
+export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals, onEdit }) => {
   const handleMarkDone = async (id: number, currentCompleted: boolean) => {
     try {
       const response = await api.put(`/goals/${id}/complete`);
@@ -44,6 +45,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ goals, setGoals }) => {
               key={goal.id}
               goal={goal}
               onMarkDone={() => handleMarkDone(goal.id ?? 0, goal.completed ?? false)}
+              onEdit={onEdit}
             />
           ))}
         </div>
