@@ -57,7 +57,6 @@ export const HomeOrganism: React.FC = () => {
           title: newTitle,
           description: newDescription,
         });
-        console.log('Patch response:', response.data);
         setGoals(goals.map((g) => (g.id === id ? { ...g, ...response.data } : g)));
       } catch (error) {
         console.error('Error updating goal:', error.response?.data || error.message);
@@ -65,17 +64,32 @@ export const HomeOrganism: React.FC = () => {
     }
   };
 
+  const handleMarkDone = async (id: number, completed: boolean) => {
+    try {
+      const response = await api.put(`/goals/${id}/complete`);
+      if (response.data === null) {
+        // Daily goal deleted
+        setGoals(goals.filter((g) => g.id !== id));
+      } else {
+        // Weekly goal updated
+        setGoals(goals.map((g) => (g.id === id ? { ...g, completed: true } : g)));
+      }
+    } catch (error) {
+      console.error('Error marking goal done:', error);
+    }
+  };
+
   return (
     <Home>
       <Header userName="Souhail" />
       <br />
-      <GoalsList goals={goals} setGoals={setGoals} onEdit={handleEdit} /> {/* Pass onEdit here */}
+      <GoalsList goals={goals} setGoals={setGoals} onEdit={handleEdit} onMarkDone={handleMarkDone} />
       <AddButton onClick={() => setIsModalOpen(true)}>+</AddButton>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddGoal}
-        onEdit={handleEdit} 
+        onEdit={handleEdit}
       />
     </Home>
   );

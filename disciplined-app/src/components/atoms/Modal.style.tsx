@@ -74,8 +74,8 @@ export const RadioGroup = styled.div`
 `;
 
 export const SubmitButton = styled.button`
-  background-color: var(--soft-teal);
-  color: var(--white);
+  background: linear-gradient(to bottom, #000000,#19468a );
+  color: white;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
@@ -83,6 +83,7 @@ export const SubmitButton = styled.button`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #26c6da;
+    color: white;
+    background-color: #000000;
   }
 `;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '../atoms/Button';
 import { Text } from '../atoms/Text';
-import { GoalDescription, GoalTitle, GoalCard as StyledGoalCard } from './GoalCard.style';
+import { EditButton, GoalDescription, GoalTitle, GoalCard as StyledGoalCard } from './GoalCard.style';
 import { Goal } from '../../types/goal';
 
 interface GoalCardProps {
@@ -15,16 +15,16 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onMarkDone, onEdit }) 
     <StyledGoalCard>
       <GoalTitle>{goal.title}</GoalTitle>
       <GoalDescription>{goal.description}</GoalDescription>
-     <div style={{ display: 'flex', gap: '10px' }}>
+     <div style={{ margin: '10px',display: 'flex', gap: '20px' }}>
   <Button
     variant={goal.completed ? 'success' : 'primary'}
     onClick={() => onMarkDone(goal.id ?? 0, goal.completed ?? false)}
   >
     {goal.completed ? 'Mark Undone' : 'Mark Done'}
   </Button>
-  <Button variant="primary" onClick={() => onEdit(goal.id ?? 0)}>
+  <EditButton  onClick={() => onEdit(goal.id ?? 0)}>
     Edit
-  </Button>
+  </EditButton>
 </div>
     </StyledGoalCard>
   );

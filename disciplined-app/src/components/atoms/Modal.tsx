@@ -66,7 +66,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
                   checked={isDaily}
                   onChange={() => setIsDaily(true)}
                 />
-                Daily (Every Day)
+                Daily
               </label>
               <label>
                 <input
@@ -74,7 +74,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
                   checked={!isDaily}
                   onChange={() => setIsDaily(false)}
                 />
-                One-Time (Short Goal)
+                Weekly
               </label>
             </RadioGroup>
           </FormGroup>
