@@ -7,6 +7,7 @@ export declare class GoalsService {
     getGoals(): Promise<Goal[]>;
     markGoalDone(id: number): Promise<Goal | null>;
     updateGoal(id: number, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Promise<Goal | null>;
+    deleteGoal(id: number): Promise<void>;
     resetDailyGoals(): Promise<void>;
     sendReminder(): Promise<void>;
 }

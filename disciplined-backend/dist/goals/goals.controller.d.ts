@@ -7,5 +7,6 @@ export declare class GoalsController {
     findAll(): Promise<Goal[]>;
     getToday(): Promise<Goal[]>;
     complete(id: string): Promise<Goal | null>;
+    delete(id: string): Promise<void>;
     update(id: string, updateData: Partial<Pick<Goal, 'title' | 'description'>>): Promise<Goal | null>;
 }

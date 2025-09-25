@@ -32,6 +32,9 @@ let GoalsController = class GoalsController {
     async complete(id) {
         return this.goalsService.markGoalDone(parseInt(id));
     }
+    async delete(id) {
+        await this.goalsService.deleteGoal(parseInt(id));
+    }
     async update(id, updateData) {
         return this.goalsService.updateGoal(parseInt(id), updateData);
     }
@@ -63,6 +66,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], GoalsController.prototype, "complete", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], GoalsController.prototype, "delete", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

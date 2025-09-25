@@ -53,6 +53,14 @@ let GoalsService = class GoalsService {
         Object.assign(goal, updateData);
         return await this.goalsRepository.save(goal);
     }
+    async deleteGoal(id) {
+        const goal = await this.goalsRepository.findOne({ where: { id } });
+        if (!goal) {
+            throw new Error('Goal not found');
+        }
+        await this.goalsRepository.remove(goal);
+        console.log(`Goal with ID ${id} deleted`);
+    }
     async resetDailyGoals() {
         const now = luxon_1.DateTime.now().setZone('Europe/Paris');
         const dailyGoals = await this.goalsRepository.find({ where: { type: 'daily', completed: false } });

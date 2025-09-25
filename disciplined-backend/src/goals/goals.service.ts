@@ -42,6 +42,14 @@ export class GoalsService {
     Object.assign(goal, updateData);
     return await this.goalsRepository.save(goal);
   }
+  async deleteGoal(id: number): Promise<void> {
+    const goal = await this.goalsRepository.findOne({ where: { id } });
+    if (!goal) {
+      throw new Error('Goal not found');
+    }
+    await this.goalsRepository.remove(goal);
+    console.log(`Goal with ID ${id} deleted`);
+  }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { timeZone: 'Europe/Paris' })
   async resetDailyGoals() {

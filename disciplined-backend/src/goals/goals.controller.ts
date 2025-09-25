@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Patch, Delete } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { Goal } from './entities/goal.entity'; // Update import to entity
 
@@ -25,7 +25,10 @@ export class GoalsController {
   async complete(@Param('id') id: string): Promise<Goal | null> {
     return this.goalsService.markGoalDone(parseInt(id));
   }
-
+@Delete(':id')
+  async delete(@Param('id') id: string): Promise<void> {
+    await this.goalsService.deleteGoal(parseInt(id));
+  }
   @Patch(':id')
   async update(
     @Param('id') id: string,
